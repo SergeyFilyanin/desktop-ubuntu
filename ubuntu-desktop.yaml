@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-desktop
+spec:
+  type: NodePort
+  ports:
+  - name: desktop-vnc
+    port: 5900
+    targetPort: 5900
+    nodePort: 31224
+    protocol: TCP
+  selector:
+    app: ubuntu-desktop
+
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: ubuntu-dekstop
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ubuntu-desktop
+    spec:
+      containers:
+        - name: ubuntu-desktop
+          image: dorowu/ubuntu-desktop-lxde-vnc
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: ubuntu-data
+      volumes:
+        - name: ubuntu-data
+          emptyDir: {}
